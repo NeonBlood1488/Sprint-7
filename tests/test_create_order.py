@@ -24,7 +24,9 @@ class TestCreateOrder:
             "deliveryDate": "2025-12-31",
             "comment": "Тест",
             "color": colors}
-        response = requests.post(f"{BASE_URL}{ORDERS_PATH}", json=payload)
+        response = requests.post(f"{BASE_URL}{ORDERS_PATH}", json=payload)   # Отправка запроса на создание заказа
+
+        # Проверка успешного создания и наличия track
         assert response.status_code == 201
         assert "track" in response.json()
         assert isinstance(response.json()["track"], int)

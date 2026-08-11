@@ -17,29 +17,25 @@ class TestCreateCourier:
 
     @allure.title("Нельзя создать двух одинаковых курьеров")
     def test_create_duplicate_courier_fails(self):
-        login, password, first_name, _ = create_courier()
+        login, password, first_name, _ = create_courier()   # Пытаемся создать второго с теми же данными
         _, _, _, response2 = create_courier(login=login, password=password, first_name=first_name)
-        assert response2.status_code == 409
-        assert response2.json().get("message") == ERR_LOGIN_ALREADY_USED
+        assert response2.status_code == 409   # Ждём-с ответ 409
+        assert response2.json().get("message") == ERR_LOGIN_ALREADY_USED  # И ошибку
         courier_id = login_courier(login, password)
         delete_courier(courier_id)
 
     @allure.title("Обязательные поля (логин и пароль) должны присутствовать")
     @pytest.mark.parametrize("missing_field", ["login", "password"])
     def test_create_courier_missing_field_fails(self, missing_field):
-        data = {
-            "login": generate_random_string(),
-            "password": generate_random_string(),
-            "firstName": generate_random_string()}
-        del data[missing_field]
+        data = {"login": generate_random_string(),"password": generate_random_string(),"firstName": generate_random_string()}
+        del data[missing_field]   # Удаляем одно из обязательных полей
         response = requests.post(f"{BASE_URL}{COURIER_PATH}", data=data)
-        assert response.status_code == 400
-        assert response.json().get("message") == ERR_CREATE_MISSING_FIELD
+        assert response.status_code == 400     # Ожидаем ответ 400
+        assert response.json().get("message") == ERR_CREATE_MISSING_FIELD   # И сообщение об ошибке
 
-    @allure.title("Успешный запрос возвращает {'ok': true}")
+    @allure.title("Успешный запрос возвращает ok: true")
     def test_create_courier_returns_ok(self):
         login, password, first_name, response = create_courier()
-        assert response.json() == {"ok": True}
+        assert response.json() == {"ok": True}   # Проверяем только поле ok, т.к. статус уже проверен ранее
         courier_id = login_courier(login, password)
         delete_courier(courier_id)
-# Просто так
